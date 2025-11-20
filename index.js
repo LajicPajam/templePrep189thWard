@@ -162,6 +162,37 @@ app.post("/delete/:id", requireEditorOrAdmin, async (req, res) => {
   res.redirect("/");
 });
 
+// --- EDIT QUOTE PAGE (Admin only) ---
+app.get("/edit/:id", requireAdmin, async (req, res) => {
+  const quote = await db("quotes").where("id", req.params.id).first();
+  
+  if (!quote) {
+    return res.status(404).send("Quote not found");
+  }
+  
+  // Parse the quote into lines for editing
+  const lines = quote.quote.split('\n').map(line => {
+    const parts = line.split(':');
+    return {
+      name: parts[0].trim(),
+      text: parts.slice(1).join(':').trim()
+    };
+  });
+  
+  res.render("edit", { quote, lines, user: req.session.user });
+});
+
+// --- UPDATE QUOTE (Admin only) ---
+app.post("/edit/:id", requireAdmin, async (req, res) => {
+  const { names, quotes } = req.body;
+  
+  const fullQuote = names.map((name, i) => `${name.trim()}: ${quotes[i].trim()}`).join('\n');
+  
+  await db("quotes").where("id", req.params.id).update({ quote: fullQuote });
+  
+  res.redirect("/");
+});
+
 // --- USERS MANAGEMENT PAGE (Admin only) ---
 app.get("/users", requireAdmin, async (req, res) => {
   const users = await db("users").select("*").orderBy("created_at", "desc");
