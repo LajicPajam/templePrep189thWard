@@ -44,11 +44,19 @@ async function setupDatabase() {
       table.timestamp("created_at").defaultTo(db.fn.now());
     });
 
+    // ADD THIS:
+    await db.schema.createTableIfNotExists("sessions", (table) => {
+      table.string("sid").primary();
+      table.json("sess").notNullable();
+      table.timestamp("expire", { precision: 6 }).notNullable();
+    });
+
     console.log("✅ Database tables ready");
   } catch (err) {
     console.error("Error setting up tables:", err);
   }
 }
+
 
 setupDatabase();
 
