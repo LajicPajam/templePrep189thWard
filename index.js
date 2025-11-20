@@ -102,20 +102,24 @@ function requireLogin(req, res, next) {
 
 function requireAdmin(req, res, next) {
   if (!req.session.user || req.session.user.role !== "admin")
-    return res.status(403).send("Admins only");
+    return res.status(403).send("Admin access only");
+  next();
+}
+
+function requireEditorOrAdmin(req, res, next) {
+  if (!req.session.user || (req.session.user.role !== "admin" && req.session.user.role !== "editor"))
+    return res.status(403).send("Editor or Admin access required");
   next();
 }
 
 // --- HOME PAGE ---
 app.get("/", requireLogin, async (req, res) => {
-  const searchName = req.query.search || ''; // Get search query from URL
+  const searchName = req.query.search || '';
   let quotes = await db("quotes").select("*").orderBy("created_at", "desc");
   
-  // Filter quotes if search query exists
   if (searchName) {
     const trimmedSearch = searchName.trim().toLowerCase();
     quotes = quotes.filter(q => {
-      // Check if any line in the quote contains the searched name (case-insensitive, flexible)
       const lines = q.quote.split('\n');
       return lines.some(line => {
         const parts = line.split(':');
@@ -131,13 +135,13 @@ app.get("/", requireLogin, async (req, res) => {
   res.render("index", { quotes, user: req.session.user, searchName });
 });
 
-// --- ADD QUOTE PAGE (NEW) ---
-app.get("/add", requireLogin, (req, res) => {
+// --- ADD QUOTE PAGE (Editor or Admin only) ---
+app.get("/add", requireEditorOrAdmin, (req, res) => {
   res.render("add", { user: req.session.user, lastQuote: null, success: false });
 });
 
-// --- ADD QUOTE (Updated to redirect to add page with success message) ---
-app.post("/add", requireLogin, async (req, res) => {
+// --- ADD QUOTE (Editor or Admin only) ---
+app.post("/add", requireEditorOrAdmin, async (req, res) => {
   const { names, quotes } = req.body;
 
   const fullQuote = names.map((name, i) => `${name.trim()}: ${quotes[i].trim()}`).join('\n');
@@ -147,22 +151,45 @@ app.post("/add", requireLogin, async (req, res) => {
   res.render("add", { user: req.session.user, lastQuote: newQuote, success: true });
 });
 
-// --- ADD QUOTE ---
-app.post("/add", requireLogin, async (req, res) => {
-  const { names, quotes } = req.body; // arrays
-
-  // Combine each line as "Name: Quote" and TRIM whitespace from names
-  const fullQuote = names.map((name, i) => `${name.trim()}: ${quotes[i].trim()}`).join('\n');
-
-  await db("quotes").insert({ quote: fullQuote });
-  res.redirect("/");
-});
-
-// --- DELETE QUOTE (Admin only) ---
-app.post("/delete/:id", requireAdmin, async (req, res) => {
+// --- DELETE QUOTE (Editor or Admin only) ---
+app.post("/delete/:id", requireEditorOrAdmin, async (req, res) => {
   await db("quotes").where("id", req.params.id).del();
   res.redirect("/");
 });
+
+// --- USERS MANAGEMENT PAGE (Admin only) ---
+app.get("/users", requireAdmin, async (req, res) => {
+  const users = await db("users").select("*").orderBy("created_at", "desc");
+  res.render("users", { users, user: req.session.user });
+});
+
+// --- UPDATE USER ROLE (Admin only) ---
+app.post("/users/:id/role", requireAdmin, async (req, res) => {
+  const { role } = req.body;
+  await db("users").where("id", req.params.id).update({ role });
+  res.redirect("/users");
+});
+
+// --- DELETE USER (Admin only) ---
+app.post("/users/:id/delete", requireAdmin, async (req, res) => {
+  const userId = req.params.id;
+  
+  // Prevent deleting yourself
+  if (parseInt(userId) === req.session.user.id) {
+    return res.status(400).send("You cannot delete your own account");
+  }
+  
+  await db("users").where("id", userId).del();
+  res.redirect("/users");
+});
+
+// --- UPDATE USER INFO (Admin only) ---
+app.post("/users/:id/update", requireAdmin, async (req, res) => {
+  const { username, email } = req.body;
+  await db("users").where("id", req.params.id).update({ username, email });
+  res.redirect("/users");
+});
+
 
 // --- LOGIN ---
 app.get("/login", (req, res) => {

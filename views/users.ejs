@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Users - The Edgy Campers</title>
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .user-card {
+      border-radius: 12px;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+    .badge-admin { background-color: #dc3545; }
+    .badge-editor { background-color: #0d6efd; }
+    .badge-user { background-color: #6c757d; }
+  </style>
+</head>
+
+<body>
+  <div class="container py-4" style="max-width: 900px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="fw-bold">User Management</h1>
+      <div class="text-end">
+        <small class="text-muted">
+          Logged in as <strong><%= user.username %></strong> (<%= user.role %>)
+        </small><br>
+        <a href="/" class="btn btn-sm btn-outline-primary mt-1">← Back to Quotes</a>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Roles:</strong>
+      <ul class="mb-0 mt-2">
+        <li><strong>Admin:</strong> Full access - manage users, add/delete quotes</li>
+        <li><strong>Editor:</strong> Can add and delete quotes, but cannot manage users</li>
+        <li><strong>User:</strong> View-only access, can search quotes</li>
+      </ul>
+    </div>
+
+    <h4 class="mb-3">All Users (<%= users.length %>)</h4>
+
+    <% users.forEach(u => { %>
+    <div class="user-card">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h5 class="mb-1">
+            <%= u.username %>
+            <% if (u.id === user.id) { %>
+              <span class="badge bg-success">You</span>
+            <% } %>
+          </h5>
+          <p class="text-muted mb-1"><%= u.email %></p>
+          <small class="text-muted">
+            Joined: <%= new Date(u.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+          </small>
+        </div>
+
+        <div class="col-md-6">
+          <div class="d-flex gap-2 justify-content-md-end mt-3 mt-md-0">
+            <!-- Role Badge & Change -->
+            <form action="/users/<%= u.id %>/role" method="POST" class="d-flex gap-2">
+              <select name="role" class="form-select form-select-sm" style="width: auto;" <% if (u.id === user.id) { %>disabled<% } %>>
+                <option value="admin" <% if (u.role === 'admin') { %>selected<% } %>>Admin</option>
+                <option value="editor" <% if (u.role === 'editor') { %>selected<% } %>>Editor</option>
+                <option value="user" <% if (u.role === 'user') { %>selected<% } %>>User</option>
+              </select>
+              <% if (u.id !== user.id) { %>
+                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+              <% } %>
+            </form>
+
+            <!-- Delete Button -->
+            <% if (u.id !== user.id) { %>
+            <form action="/users/<%= u.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete <%= u.username %>?');">
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+            <% } %>
+
+            <!-- Edit Button (Toggle) -->
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#edit-<%= u.id %>">
+              Edit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Form (Collapsed by default) -->
+      <div class="collapse mt-3" id="edit-<%= u.id %>">
+        <hr>
+        <form action="/users/<%= u.id %>/update" method="POST" class="row g-2">
+          <div class="col-md-5">
+            <label class="form-label fw-bold">Username</label>
+            <input type="text" name="username" class="form-control" value="<%= u.username %>" required>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label fw-bold">Email</label>
+            <input type="email" name="email" class="form-control" value="<%= u.email %>" required>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <% }) %>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
