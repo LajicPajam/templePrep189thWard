@@ -34,6 +34,16 @@
         width: 100% !important;
       }
     }
+
+    body {
+    background-image: url('/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+  }
+
   </style>
 </head>
 
@@ -48,11 +58,6 @@
             </small><br>
             <div class="d-flex gap-2 justify-content-end mt-1">
                 <a href="/" class="btn btn-sm btn-outline-primary">← Back to Quotes</a>
-                <% if (user.role === "admin") { %>
-                    <a href="/users" class="text-primary" style="font-size: 0.9rem;">|</a>
-                    <a href="/users" class="text-primary" style="font-size: 0.9rem;">Users</a>
-                <% } %>
-                <a href="/logout" class="text-danger" style="font-size: 0.9rem;">Logout</a>
             </div>
         </div>
     </div>
