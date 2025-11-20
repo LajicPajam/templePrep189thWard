@@ -26,6 +26,32 @@ const db = knex({
   },
 });
 
+// --- AUTO-CREATE TABLES ON STARTUP ---
+async function setupDatabase() {
+  try {
+    await db.schema.createTableIfNotExists("users", (table) => {
+      table.increments("id").primary();
+      table.string("username").notNullable();
+      table.string("email").unique().notNullable();
+      table.string("password").notNullable();
+      table.string("role").defaultTo("user");
+      table.timestamp("created_at").defaultTo(db.fn.now());
+    });
+
+    await db.schema.createTableIfNotExists("quotes", (table) => {
+      table.increments("id").primary();
+      table.text("quote").notNullable();
+      table.timestamp("created_at").defaultTo(db.fn.now());
+    });
+
+    console.log("✅ Database tables ready");
+  } catch (err) {
+    console.error("Error setting up tables:", err);
+  }
+}
+
+setupDatabase();
+
 // --- SESSIONS ---
 const store = new KnexSessionStore({
   knex: db,
