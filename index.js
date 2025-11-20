@@ -29,33 +29,45 @@ const db = knex({
 // --- AUTO-CREATE TABLES ON STARTUP ---
 async function setupDatabase() {
   try {
-    await db.schema.createTableIfNotExists("users", (table) => {
-      table.increments("id").primary();
-      table.string("username").notNullable();
-      table.string("email").unique().notNullable();
-      table.string("password").notNullable();
-      table.string("role").defaultTo("user");
-      table.timestamp("created_at").defaultTo(db.fn.now());
-    });
+    // Check and create users table
+    const hasUsersTable = await db.schema.hasTable("users");
+    if (!hasUsersTable) {
+      await db.schema.createTable("users", (table) => {
+        table.increments("id").primary();
+        table.string("username").notNullable();
+        table.string("email").unique().notNullable();
+        table.string("password").notNullable();
+        table.string("role").defaultTo("user");
+        table.timestamp("created_at").defaultTo(db.fn.now());
+      });
+    }
 
-    await db.schema.createTableIfNotExists("quotes", (table) => {
-      table.increments("id").primary();
-      table.text("quote").notNullable();
-      table.timestamp("created_at").defaultTo(db.fn.now());
-    });
+    // Check and create quotes table
+    const hasQuotesTable = await db.schema.hasTable("quotes");
+    if (!hasQuotesTable) {
+      await db.schema.createTable("quotes", (table) => {
+        table.increments("id").primary();
+        table.text("quote").notNullable();
+        table.timestamp("created_at").defaultTo(db.fn.now());
+      });
+    }
 
-    // ADD THIS:
-    await db.schema.createTableIfNotExists("sessions", (table) => {
-      table.string("sid").primary();
-      table.json("sess").notNullable();
-      table.timestamp("expire", { precision: 6 }).notNullable();
-    });
+    // Check and create sessions table
+    const hasSessionsTable = await db.schema.hasTable("sessions");
+    if (!hasSessionsTable) {
+      await db.schema.createTable("sessions", (table) => {
+        table.string("sid").primary();
+        table.json("sess").notNullable();
+        table.timestamp("expire", { precision: 6 }).notNullable();
+      });
+    }
 
     console.log("✅ Database tables ready");
   } catch (err) {
     console.error("Error setting up tables:", err);
   }
 }
+
 
 
 setupDatabase();
