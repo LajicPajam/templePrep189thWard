@@ -1,0 +1,1 @@
+{"name":"quote-wall","version":"1.0.0","description":"A roommate quote wall deployed on AWS Elastic Beanstalk","main":"index.js","scripts":{"start":"node index.js"},"dependencies":{"bcryptjs":"^3.0.3","connect-session-knex":"^4.0.2","dotenv":"^17.2.3","ejs":"^3.1.10","express":"^4.21.2","express-session":"^1.18.2","knex":"^2.5.1","pg":"^8.11.3"}}
