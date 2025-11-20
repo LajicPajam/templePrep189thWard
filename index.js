@@ -107,10 +107,22 @@ function requireAdmin(req, res, next) {
 }
 
 // --- HOME PAGE ---
+// --- HOME PAGE ---
 app.get("/", requireLogin, async (req, res) => {
-  const quotes = await db("quotes").select("*").orderBy("id", "desc");
-  res.render("index", { quotes, user: req.session.user });
+  const searchName = req.query.search || ''; // Get search query from URL
+  let quotes = await db("quotes").select("*").orderBy("created_at", "desc");
+  
+  // Filter quotes if search query exists
+  if (searchName) {
+    quotes = quotes.filter(q => {
+      // Check if any line in the quote contains the searched name
+      return q.quote.toLowerCase().includes(searchName.toLowerCase() + ':');
+    });
+  }
+  
+  res.render("index", { quotes, user: req.session.user, searchName });
 });
+
 
 // --- ADD QUOTE ---
 app.post("/add", requireLogin, async (req, res) => {

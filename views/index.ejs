@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Roommate Quote Wall</title>
+  <title>The Edgy Campers Quote Wall</title>
   
   <!-- Viewport meta tag for mobile responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,9 +23,31 @@
     .quote-text {
       font-size: 1.2rem;
       font-style: italic;
+      word-wrap: break-word;
     }
     .quote-name {
       color: #6c757d;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.5rem !important;
+      }
+      .quote-text {
+        font-size: 1rem;
+      }
+      .header-section {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem;
+      }
+      .quote-line {
+        flex-direction: column !important;
+      }
+      .quote-line input {
+        width: 100% !important;
+      }
     }
   </style>
 </head>
@@ -33,7 +55,7 @@
 <body>
   <div class="container py-4" style="max-width: 750px;">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 header-section">
       <h1 class="fw-bold">The Edgy Campers Quote Wall</h1>
       <div class="text-end">
         <small class="text-muted">
@@ -43,12 +65,34 @@
       </div>
     </div>
 
+    <!-- Search Form -->
+    <div class="card p-3 mb-4 shadow-sm">
+      <form action="/" method="GET" class="d-flex gap-2">
+        <input 
+          type="text" 
+          name="search" 
+          class="form-control" 
+          placeholder="Search by name..." 
+          value="<%= searchName %>"
+        >
+        <button type="submit" class="btn btn-primary">Search</button>
+        <% if (searchName) { %>
+          <a href="/" class="btn btn-secondary">Clear</a>
+        <% } %>
+      </form>
+      <% if (searchName) { %>
+        <small class="text-muted mt-2">
+          Showing results for: <strong>"<%= searchName %>"</strong>
+        </small>
+      <% } %>
+    </div>
+
     <!-- Add Quote Form -->
     <div class="card p-4 mb-4 shadow-sm">
     <form action="/add" method="POST" id="quoteForm">
         
         <div id="quoteLines">
-        <div class="quote-line mb-3 d-flex gap-2">
+        <div class="quote-line mb-3 d-flex flex-column flex-md-row gap-2">
             <input type="text" name="names[]" class="form-control" placeholder="Who said it?" required>
             <input type="text" name="quotes[]" class="form-control" placeholder="Enter a line..." required>
         </div>
@@ -65,7 +109,7 @@
 
     addLineBtn.addEventListener('click', () => {
         const lineDiv = document.createElement('div');
-        lineDiv.classList.add('quote-line', 'mb-3', 'd-flex', 'gap-2');
+        lineDiv.classList.add('quote-line', 'mb-3', 'd-flex', 'flex-column', 'flex-md-row', 'gap-2');
 
         lineDiv.innerHTML = `
         <input type="text" name="names[]" class="form-control" placeholder="Who said it?" required>
@@ -82,9 +126,12 @@
     });
     </script>
 
-
     <% if (quotes.length === 0) { %>
-      <p class="text-center text-muted">No quotes yet. Add one!</p>
+      <% if (searchName) { %>
+        <p class="text-center text-muted">No quotes found for "<%= searchName %>". <a href="/">View all quotes</a></p>
+      <% } else { %>
+        <p class="text-center text-muted">No quotes yet. Add one!</p>
+      <% } %>
     <% } %>
 
     <!-- Quote List -->
@@ -93,16 +140,20 @@
         <% 
         const lines = q.quote.split('\n'); 
         
-        // Format the date to show only the date (not time)
+        // Format the date
         const date = new Date(q.created_at);
-        const formattedDate = date.toLocaleDateString('en-US');
+        const formattedDate = date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+        });
         %>
 
         <% lines.forEach(line => { %>
         <% if(line.trim() !== '') { 
             const parts = line.split(':'); 
             const speaker = parts[0];
-            const text = parts.slice(1).join(':').trim(); // in case the line has colons
+            const text = parts.slice(1).join(':').trim();
         %>
             <div class="quote-text">
             <strong><%= speaker %>:</strong> "<%= text %>"
@@ -110,21 +161,22 @@
         <% } %>
         <% }) %>
 
-        <!-- Display the date -->
-        <div class="mt-3">
-        <small class="text-muted"><%= formattedDate %></small>
-        </div>
-
+        <!-- Date and Delete button on same row -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+        <!-- Date on the left -->
+        <small class="text-muted" style="font-style: italic; font-size: 0.85rem;">
+            <%= formattedDate %>
+        </small>
+        
+        <!-- Delete button on the right (admin only) -->
         <% if (user.role === "admin") { %>
-        <form action="/delete/<%= q.id %>" method="POST" class="mt-2 text-end">
+        <form action="/delete/<%= q.id %>" method="POST" class="m-0">
             <button class="btn btn-danger btn-sm">Delete</button>
         </form>
         <% } %>
+        </div>
     </div>
     <% }) %>
-
-
-
 
   </div>
 
