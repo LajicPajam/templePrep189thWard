@@ -107,29 +107,52 @@ function requireAdmin(req, res, next) {
 }
 
 // --- HOME PAGE ---
-// --- HOME PAGE ---
 app.get("/", requireLogin, async (req, res) => {
   const searchName = req.query.search || ''; // Get search query from URL
   let quotes = await db("quotes").select("*").orderBy("created_at", "desc");
   
   // Filter quotes if search query exists
   if (searchName) {
+    const trimmedSearch = searchName.trim().toLowerCase();
     quotes = quotes.filter(q => {
-      // Check if any line in the quote contains the searched name
-      return q.quote.toLowerCase().includes(searchName.toLowerCase() + ':');
+      // Check if any line in the quote contains the searched name (case-insensitive, flexible)
+      const lines = q.quote.split('\n');
+      return lines.some(line => {
+        const parts = line.split(':');
+        if (parts.length > 1) {
+          const speaker = parts[0].trim().toLowerCase();
+          return speaker.includes(trimmedSearch);
+        }
+        return false;
+      });
     });
   }
   
   res.render("index", { quotes, user: req.session.user, searchName });
 });
 
+// --- ADD QUOTE PAGE (NEW) ---
+app.get("/add", requireLogin, (req, res) => {
+  res.render("add", { user: req.session.user, lastQuote: null, success: false });
+});
+
+// --- ADD QUOTE (Updated to redirect to add page with success message) ---
+app.post("/add", requireLogin, async (req, res) => {
+  const { names, quotes } = req.body;
+
+  const fullQuote = names.map((name, i) => `${name.trim()}: ${quotes[i].trim()}`).join('\n');
+
+  const [newQuote] = await db("quotes").insert({ quote: fullQuote }).returning("*");
+  
+  res.render("add", { user: req.session.user, lastQuote: newQuote, success: true });
+});
 
 // --- ADD QUOTE ---
 app.post("/add", requireLogin, async (req, res) => {
   const { names, quotes } = req.body; // arrays
 
-  // Combine each line as "Name: Quote"
-  const fullQuote = names.map((name, i) => `${name}: ${quotes[i]}`).join('\n');
+  // Combine each line as "Name: Quote" and TRIM whitespace from names
+  const fullQuote = names.map((name, i) => `${name.trim()}: ${quotes[i].trim()}`).join('\n');
 
   await db("quotes").insert({ quote: fullQuote });
   res.redirect("/");

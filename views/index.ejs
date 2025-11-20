@@ -3,10 +3,7 @@
 <head>
   <title>The Edgy Campers Quote Wall</title>
   
-  <!-- Viewport meta tag for mobile responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
@@ -29,7 +26,6 @@
       color: #6c757d;
     }
     
-    /* Mobile responsive adjustments */
     @media (max-width: 768px) {
       h1 {
         font-size: 1.5rem !important;
@@ -41,12 +37,6 @@
         flex-direction: column !important;
         align-items: flex-start !important;
         gap: 1rem;
-      }
-      .quote-line {
-        flex-direction: column !important;
-      }
-      .quote-line input {
-        width: 100% !important;
       }
     }
   </style>
@@ -63,6 +53,11 @@
         </small><br>
         <a href="/logout" class="text-danger" style="font-size: 0.9rem;">Logout</a>
       </div>
+    </div>
+
+    <!-- Add Quote Button -->
+    <div class="mb-4">
+      <a href="/add" class="btn btn-success w-100 btn-lg">+ Add New Quote</a>
     </div>
 
     <!-- Search Form -->
@@ -87,45 +82,6 @@
       <% } %>
     </div>
 
-    <!-- Add Quote Form -->
-    <div class="card p-4 mb-4 shadow-sm">
-    <form action="/add" method="POST" id="quoteForm">
-        
-        <div id="quoteLines">
-        <div class="quote-line mb-3 d-flex flex-column flex-md-row gap-2">
-            <input type="text" name="names[]" class="form-control" placeholder="Who said it?" required>
-            <input type="text" name="quotes[]" class="form-control" placeholder="Enter a line..." required>
-        </div>
-        </div>
-
-        <button type="button" class="btn btn-secondary mb-3" id="addLineBtn">+ Add Line</button>
-        <button type="submit" class="btn btn-primary w-100">Add Quote</button>
-    </form>
-    </div>
-
-    <script>
-    const addLineBtn = document.getElementById('addLineBtn');
-    const quoteLines = document.getElementById('quoteLines');
-
-    addLineBtn.addEventListener('click', () => {
-        const lineDiv = document.createElement('div');
-        lineDiv.classList.add('quote-line', 'mb-3', 'd-flex', 'flex-column', 'flex-md-row', 'gap-2');
-
-        lineDiv.innerHTML = `
-        <input type="text" name="names[]" class="form-control" placeholder="Who said it?" required>
-        <input type="text" name="quotes[]" class="form-control" placeholder="Enter a line..." required>
-        <button type="button" class="btn btn-danger btn-sm removeLineBtn">✕</button>
-        `;
-
-        quoteLines.appendChild(lineDiv);
-
-        // Attach remove functionality
-        lineDiv.querySelector('.removeLineBtn').addEventListener('click', () => {
-        lineDiv.remove();
-        });
-    });
-    </script>
-
     <% if (quotes.length === 0) { %>
       <% if (searchName) { %>
         <p class="text-center text-muted">No quotes found for "<%= searchName %>". <a href="/">View all quotes</a></p>
@@ -139,13 +95,11 @@
     <div class="quote-card">
         <% 
         const lines = q.quote.split('\n'); 
-        
-        // Format the date
         const date = new Date(q.created_at);
         const formattedDate = date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
         });
         %>
 
@@ -161,19 +115,16 @@
         <% } %>
         <% }) %>
 
-        <!-- Date and Delete button on same row -->
         <div class="d-flex justify-content-between align-items-center mt-3">
-        <!-- Date on the left -->
-        <small class="text-muted" style="font-style: italic; font-size: 0.85rem;">
-            <%= formattedDate %>
-        </small>
-        
-        <!-- Delete button on the right (admin only) -->
-        <% if (user.role === "admin") { %>
-        <form action="/delete/<%= q.id %>" method="POST" class="m-0">
-            <button class="btn btn-danger btn-sm">Delete</button>
-        </form>
-        <% } %>
+          <small class="text-muted" style="font-style: italic; font-size: 0.85rem;">
+              <%= formattedDate %>
+          </small>
+          
+          <% if (user.role === "admin") { %>
+          <form action="/delete/<%= q.id %>" method="POST" class="m-0">
+              <button class="btn btn-danger btn-sm">Delete</button>
+          </form>
+          <% } %>
         </div>
     </div>
     <% }) %>
