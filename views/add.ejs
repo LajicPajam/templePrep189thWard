@@ -41,20 +41,24 @@
   <div class="container py-4" style="max-width: 750px;">
 
     <div class="d-flex justify-content-between align-items-center mb-4 header-section">
-        <h1 class="fw-bold">The Edgy Campers Quote Wall</h1>
+        <div>
+            <a href="/" class="btn btn-sm btn-outline-secondary mb-2">
+                ← Back to Quotes
+            </a>
+            <h1 class="fw-bold mb-0">Add New Quote</h1>
+        </div>
         <div class="text-end">
             <small class="text-muted">
-            Logged in as <strong><%= user.username %></strong> (<%= user.role %>)
+                Logged in as <strong><%= user.username %></strong> (<%= user.role %>)
             </small><br>
             <div class="d-flex gap-2 justify-content-end mt-1">
-            <% if (user.role === "admin") { %>
-                <a href="/users" class="text-primary" style="font-size: 0.9rem;">Users</a>
-            <% } %>
-            <a href="/logout" class="text-danger" style="font-size: 0.9rem;">Logout</a>
+                <% if (user.role === "admin") { %>
+                    <a href="/users" class="text-primary" style="font-size: 0.9rem;">Users</a>
+                <% } %>
+                <a href="/logout" class="text-danger" style="font-size: 0.9rem;">Logout</a>
             </div>
         </div>
     </div>
-
 
     <!-- Success Message -->
     <% if (success && lastQuote) { %>

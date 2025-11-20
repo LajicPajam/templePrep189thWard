@@ -115,7 +115,12 @@ function requireEditorOrAdmin(req, res, next) {
 // --- HOME PAGE ---
 app.get("/", requireLogin, async (req, res) => {
   const searchName = req.query.search || '';
-  let quotes = await db("quotes").select("*").orderBy("created_at", "desc");
+  const sortOrder = req.query.sort || 'newest'; // Default to newest
+  
+  // Determine sort direction
+  const orderDirection = sortOrder === 'oldest' ? 'asc' : 'desc';
+  
+  let quotes = await db("quotes").select("*").orderBy("created_at", orderDirection);
   
   if (searchName) {
     const trimmedSearch = searchName.trim().toLowerCase();
@@ -132,7 +137,7 @@ app.get("/", requireLogin, async (req, res) => {
     });
   }
   
-  res.render("index", { quotes, user: req.session.user, searchName });
+  res.render("index", { quotes, user: req.session.user, searchName, sortOrder });
 });
 
 // --- ADD QUOTE PAGE (Editor or Admin only) ---

@@ -75,26 +75,50 @@
     </div>
     <% } %>
 
-    <!-- Search Form -->
+    <!-- Search and Sort Controls -->
     <div class="card p-3 mb-4 shadow-sm">
-      <form action="/" method="GET" class="d-flex gap-2">
-        <input 
-          type="text" 
-          name="search" 
-          class="form-control" 
-          placeholder="Search by name..." 
-          value="<%= searchName %>"
+    <div class="row g-3">
+        <!-- Search Form -->
+        <div class="col-md-8">
+        <form action="/" method="GET" class="d-flex gap-2" id="searchForm">
+            <input 
+            type="text" 
+            name="search" 
+            class="form-control" 
+            placeholder="Search by name..." 
+            value="<%= searchName %>"
         >
+        <!-- Hidden sort field to preserve sort when searching -->
+        <input type="hidden" name="sort" value="<%= sortOrder %>">
+        
         <button type="submit" class="btn btn-primary">Search</button>
         <% if (searchName) { %>
-          <a href="/" class="btn btn-secondary">Clear</a>
+          <a href="/?sort=<%= sortOrder %>" class="btn btn-secondary">Clear</a>
         <% } %>
       </form>
-      <% if (searchName) { %>
+    </div>
+
+    <!-- Sort Dropdown -->
+    <div class="col-md-4">
+        <form action="/" method="GET" id="sortForm">
+            <!-- Preserve search when sorting -->
+            <% if (searchName) { %>
+            <input type="hidden" name="search" value="<%= searchName %>">
+            <% } %>
+            
+            <select name="sort" class="form-select" onchange="this.form.submit()">
+            <option value="newest" <% if (sortOrder === 'newest') { %>selected<% } %>>Newest First</option>
+            <option value="oldest" <% if (sortOrder === 'oldest') { %>selected<% } %>>Oldest First</option>
+            </select>
+        </form>
+        </div>
+    </div>
+
+    <% if (searchName) { %>
         <small class="text-muted mt-2">
-          Showing results for: <strong>"<%= searchName %>"</strong>
+        Showing results for: <strong>"<%= searchName %>"</strong>
         </small>
-      <% } %>
+    <% } %>
     </div>
 
     <% if (quotes.length === 0) { %>
