@@ -164,14 +164,14 @@ app.post("/like/:id", requireLogin, async (req, res) => {
   const quoteId = req.params.id;
   const userId = req.session.user.id;
 
-  try {
-    // attempt to insert (unique prevents duplicates)
-    await db("likes").insert({
-      user_id: userId,
-      quote_id: quoteId,
-    });
-  } catch (e) {
-    // user already liked – ignore
+  const existing = await db("likes")
+    .where({ user_id: userId, quote_id: quoteId })
+    .first();
+
+  if (existing) {
+    await db("likes").where("id", existing.id).del();
+  } else {
+    await db("likes").insert({ user_id: userId, quote_id: quoteId });
   }
 
   res.redirect("/");
