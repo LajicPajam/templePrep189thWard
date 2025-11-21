@@ -49,7 +49,7 @@
     
     .quote-text {
         font-size: 1.2rem;
-        font-style: italic;
+
         word-wrap: break-word;
     }
     
@@ -192,6 +192,13 @@
             <small class="text-muted" style="font-style: italic; font-size: 0.85rem;">
                 <%= formattedDate %>
             </small>
+
+            <div class="d-flex gap-2">
+                <form action="/like/<%= q.id %>" method="POST" class="m-0">
+                    <button class="btn btn-outline-success btn-sm">
+                        ❤️ Like (<%= q.like_count %>)
+                    </button>
+                </form>
             
             <!-- Edit and Delete buttons on the right (admin only) -->
             <% if (user.role === "admin") { %>

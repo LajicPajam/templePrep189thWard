@@ -42,6 +42,18 @@ async function setupDatabase() {
       });
     }
 
+    // Check and create likes table
+    const hasLikesTable = await db.schema.hasTable("likes");
+    if (!hasLikesTable) {
+    await db.schema.createTable("likes", (table) => {
+        table.increments("id").primary();
+        table.integer("user_id").notNullable();
+        table.integer("quote_id").notNullable();
+        table.timestamp("created_at").defaultTo(db.fn.now());
+        table.unique(["user_id", "quote_id"]); // prevents duplicate likes
+    });
+    }
+
     // Check and create quotes table
     const hasQuotesTable = await db.schema.hasTable("quotes");
     if (!hasQuotesTable) {
@@ -120,7 +132,14 @@ app.get("/", requireLogin, async (req, res) => {
   // Determine sort direction
   const orderDirection = sortOrder === 'oldest' ? 'asc' : 'desc';
   
-  let quotes = await db("quotes").select("*").orderBy("created_at", orderDirection);
+    let quotes = await db("quotes")
+    .leftJoin("likes", "quotes.id", "likes.quote_id")
+    .groupBy("quotes.id")
+    .select(
+        "quotes.*",
+        db.raw("COUNT(likes.id) AS like_count")
+    )
+    .orderBy("created_at", orderDirection);
   
   if (searchName) {
     const trimmedSearch = searchName.trim().toLowerCase();
@@ -138,6 +157,41 @@ app.get("/", requireLogin, async (req, res) => {
   }
   
   res.render("index", { quotes, user: req.session.user, searchName, sortOrder });
+});
+
+// LIKE a quote
+app.post("/like/:id", requireLogin, async (req, res) => {
+  const quoteId = req.params.id;
+  const userId = req.session.user.id;
+
+  try {
+    // attempt to insert (unique prevents duplicates)
+    await db("likes").insert({
+      user_id: userId,
+      quote_id: quoteId,
+    });
+  } catch (e) {
+    // user already liked – ignore
+  }
+
+  res.redirect("/");
+});
+
+app.post("/like/:id", requireLogin, async (req, res) => {
+  const quoteId = req.params.id;
+  const userId = req.session.user.id;
+
+  const existing = await db("likes")
+    .where({ user_id: userId, quote_id: quoteId })
+    .first();
+
+  if (existing) {
+    await db("likes").where("id", existing.id).del();
+  } else {
+    await db("likes").insert({ user_id: userId, quote_id: quoteId });
+  }
+
+  res.redirect("/");
 });
 
 // --- ADD QUOTE PAGE (Editor or Admin only) ---
