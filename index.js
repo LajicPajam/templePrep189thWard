@@ -127,18 +127,26 @@ function requireEditorOrAdmin(req, res, next) {
 // --- HOME PAGE ---
 app.get("/", requireLogin, async (req, res) => {
   const searchName = req.query.search || '';
+  const sortOrder = req.query.sort || 'newest';
 
-  let quotes = await db("quotes")
+  let query = db("quotes")
     .leftJoin("likes", "quotes.id", "likes.quote_id")
     .groupBy("quotes.id")
     .select(
       "quotes.*",
       db.raw("COUNT(likes.id) AS like_count")
-    )
-    .orderBy([
-      { column: "like_count", order: "desc" },
-      { column: "created_at", order: "desc" }
-    ]);
+    );
+
+  // Apply sorting
+  if (sortOrder === "oldest") {
+    query = query.orderBy("created_at", "asc");
+  } else if (sortOrder === "likes_desc") {
+    query = query.orderBy("like_count", "desc");
+  } else {
+    query = query.orderBy("created_at", "desc");
+  }
+
+  let quotes = await query;
 
   // SEARCH (unchanged)
   if (searchName) {
@@ -156,9 +164,13 @@ app.get("/", requireLogin, async (req, res) => {
     });
   }
 
-  res.render("index", { quotes, user: req.session.user, searchName });
+  res.render("index", { 
+    quotes, 
+    user: req.session.user, 
+    searchName,
+    sortOrder
+  });
 });
-
 
 // LIKE a quote
 app.post("/like/:id", requireLogin, async (req, res) => {
