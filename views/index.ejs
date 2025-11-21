@@ -127,8 +127,9 @@
             <% } %>
 
             <select name="sort" class="form-select" onchange="this.form.submit()">
-              <option value="newest" <% if (sortOrder === 'newest') { %>selected<% } %>>Newest First</option>
-              <option value="oldest" <% if (sortOrder === 'oldest') { %>selected<% } %>>Oldest First</option>
+            <option value="newest"  <%= sortOrder === 'newest' ? 'selected' : '' %>>Newest First</option>
+            <option value="oldest"  <%= sortOrder === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+            <option value="likes_desc" <%= sortOrder === 'likes_desc' ? 'selected' : '' %>>Most Liked</option>
             </select>
           </form>
         </div>
