@@ -184,31 +184,27 @@ app.post("/like/:id", requireLogin, async (req, res) => {
     .where({ user_id: userId, quote_id: quoteId })
     .first();
 
+  let liked;
+  
   if (existing) {
     await db("likes").where("id", existing.id).del();
+    liked = false;
   } else {
     await db("likes").insert({ user_id: userId, quote_id: quoteId });
+    liked = true;
   }
 
-  res.redirect("/");
-});
-
-app.post("/like/:id", requireLogin, async (req, res) => {
-  const quoteId = req.params.id;
-  const userId = req.session.user.id;
-
-  const existing = await db("likes")
-    .where({ user_id: userId, quote_id: quoteId })
+  const newCount = await db("likes")
+    .where({ quote_id: quoteId })
+    .count("id as count")
     .first();
 
-  if (existing) {
-    await db("likes").where("id", existing.id).del();
-  } else {
-    await db("likes").insert({ user_id: userId, quote_id: quoteId });
-  }
-
-  res.redirect("/");
+  res.json({
+    liked,
+    likeCount: newCount.count
+  });
 });
+
 
 // --- ADD QUOTE PAGE (Editor or Admin only) ---
 app.get("/add", requireEditorOrAdmin, (req, res) => {
