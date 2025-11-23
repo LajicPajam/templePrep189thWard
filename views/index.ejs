@@ -189,8 +189,8 @@
     <div class="d-flex gap-2">
 
       <form action="/like/<%= q.id %>" method="POST" class="m-0">
-        <button class="btn btn-outline-success btn-sm">
-          ❤️ Like (<%= q.like_count %>)
+        <button class="btn <%= q.user_liked > 0 ? 'btn-success' : 'btn-outline-success' %> btn-sm">
+          ❤️ <%= q.user_liked > 0 ? 'Liked' : 'Like' %> (<%= q.like_count %>)
         </button>
       </form>
 

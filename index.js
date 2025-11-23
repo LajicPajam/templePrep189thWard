@@ -128,13 +128,16 @@ function requireEditorOrAdmin(req, res, next) {
 app.get("/", requireLogin, async (req, res) => {
   const searchName = req.query.search || '';
   const sortOrder = req.query.sort || 'newest';
+  const userId = req.session.user.id;
 
   let query = db("quotes")
     .leftJoin("likes", "quotes.id", "likes.quote_id")
     .groupBy("quotes.id")
     .select(
       "quotes.*",
-      db.raw("COUNT(likes.id) AS like_count")
+      db.raw("COUNT(likes.id) AS like_count"),
+      // Check if THIS user has liked the quote
+      db.raw(`SUM(CASE WHEN likes.user_id = ${userId} THEN 1 ELSE 0 END) AS user_liked`)
     );
 
   // Apply sorting
