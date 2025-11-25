@@ -1,67 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Class Lessons - Temple Prep Class</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class Lessons - Temple Prep</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
+    :root {
+      --temple-blue: #1a5490;
+      --temple-gold: #d4a574;
+      --temple-dark: #0d2f52;
+    }
+    
     body {
       font-family: 'Lato', sans-serif;
-      background-image: url('images/background.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
+      color: #333;
     }
-    .card {
-      background-color: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-    }
+    
     h1, h2 {
       font-family: 'Crimson Text', serif;
-      color: #1a5490;
+      color: var(--temple-blue);
+      font-weight: 600;
     }
-    .border-primary-top {
-      border-top: 4px solid #1a5490 !important;
+    
+    .navbar-brand {
+      font-family: 'Crimson Text', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--temple-blue) !important;
     }
-    .lesson-link {
-      border-left: 4px solid #1a5490;
-      transition: all 0.2s ease;
+    
+    .navbar {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
-    .lesson-link:hover {
-      border-left-color: #2d6ba3;
-      transform: translateX(3px);
+    
+    .page-header {
+      background: linear-gradient(135deg, var(--temple-blue) 0%, #2d6ba3 100%);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    
+    .page-header h1 {
+      color: white;
+      font-size: 2.5rem;
+      margin: 0;
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    .lesson-item {
+      padding: 18px 20px;
+      border-left: 4px solid var(--temple-gold);
+      transition: all 0.3s ease;
+      background: linear-gradient(90deg, rgba(26, 84, 144, 0.02) 0%, transparent 100%);
+    }
+    
+    .lesson-item:hover {
+      background: linear-gradient(90deg, rgba(26, 84, 144, 0.08) 0%, transparent 100%);
+      transform: translateX(8px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .lesson-number {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, var(--temple-blue) 0%, #2d6ba3 100%);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      margin-right: 12px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .lesson-title {
+      color: var(--temple-blue);
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+    
+    .btn-back {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 24px;
+      background: var(--temple-blue);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .btn-back:hover {
+      background: var(--temple-dark);
+      transform: translateX(-5px);
+      box-shadow: 0 4px 12px rgba(26, 84, 144, 0.3);
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 1.8rem;
+    }
+    
+    @media (max-width: 768px) {
+      .page-header h1 { font-size: 2rem; }
+      .lesson-item { padding: 15px; }
     }
   </style>
 </head>
 
-<body class="py-4">
-  <div class="container" style="max-width: 800px;">
-    <div class="card shadow-sm border-primary-top mb-4">
-      <div class="card-body text-center py-5">
-        <h1 class="display-4 fw-bold mb-2">Class Slides</h1>
-      </div>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-gopuram" style="margin-right: 8px;"></i>Temple Prep
+      </a>
     </div>
+  </nav>
 
-    <div class="card shadow-sm border-primary-top">
-      <div class="card-body">
-        <h2 class="text-center mb-4">All Lessons</h2>
-        <div class="d-flex flex-column gap-3">
-          <a href="https://docs.google.com/presentation/d/1L0JDKKPBcvY79oU45St_DlWQBwpcmWVlZTB8BA7uTo4/edit?slide=id.g35f391192_00#slide=id.g35f391192_00" target="_blank" class="btn btn-outline-secondary text-start lesson-link"><strong>Lesson 1:</strong> The Temple Teaches about the Great Plan of Salvation</a>
-          <a href="https://docs.google.com/presentation/d/1A5xFkGl-VawNut0giUka40lTGqN8wSaoD_sPWXjT9rw/edit?slide=id.g35f391192_00#slide=id.g35f391192_00" target="_blank" class="btn btn-outline-secondary text-start lesson-link"><strong>Lesson 2:</strong> We Must Be Worthy to Enter the Temple</a>
-          <a href="https://docs.google.com/presentation/d/1_gRH606muR6HS-vJjyto80OFarlWDs6SnhtbsTZQFpc/edit?slide=id.g35f391192_00#slide=id.g35f391192_00" target="_blank" class="btn btn-outline-secondary text-start lesson-link"><strong>Lesson 3:</strong> Temple Work Brings Great Blessings into Our Lives</a>
-          <a href="#" target="_blank" class="btn btn-outline-secondary text-start lesson-link"><strong>Lesson 4:</strong> Receiving Temple Ordinances and Covenants</a>
-          <a href="#" target="_blank" class="btn btn-outline-secondary text-start lesson-link"><strong>Lesson 5:</strong> Learning from the Lord through Symbols</a>
-          <a href="#" target="_blank" class="btn btn-outline-secondary text-start lesson-link"><strong>Lesson 6:</strong> Preparing to Enter the Holy Temple</a>
-          <a href="#" target="_blank" class="btn btn-outline-secondary text-start lesson-link"><strong>Lesson 7:</strong> Continuing to Enjoy the Blessings of Temple Attendance</a>
+  <div class="page-header">
+    <h1><i class="fas fa-presentation-screen" style="margin-right: 12px;"></i>Class Slides</h1>
+  </div>
+
+  <div class="container py-5" style="max-width: 900px;">
+    <h2 class="section-title">All Lessons</h2>
+    
+    <div class="card">
+      <div class="card-body p-0">
+        <a href="https://docs.google.com/presentation/d/1L0JDKKPBcvY79oU45St_DlWQBwpcmWVlZTB8BA7uTo4/edit?slide=id.g35f391192_00#slide=id.g35f391192_00" target="_blank" class="lesson-item d-block text-decoration-none">
+          <span class="lesson-number">1</span>
+          <span class="lesson-title">The Temple Teaches about the Great Plan of Salvation</span>
+        </a>
+        
+        <a href="https://docs.google.com/presentation/d/1A5xFkGl-VawNut0giUka40lTGqN8wSaoD_sPWXjT9rw/edit?slide=id.g35f391192_00#slide=id.g35f391192_00" target="_blank" class="lesson-item d-block text-decoration-none border-top">
+          <span class="lesson-number">2</span>
+          <span class="lesson-title">We Must Be Worthy to Enter the Temple</span>
+        </a>
+        
+        <a href="https://docs.google.com/presentation/d/1_gRH606muR6HS-vJjyto80OFarlWDs6SnhtbsTZQFpc/edit?slide=id.g35f391192_00#slide=id.g35f391192_00" target="_blank" class="lesson-item d-block text-decoration-none border-top">
+          <span class="lesson-number">3</span>
+          <span class="lesson-title">Temple Work Brings Great Blessings into Our Lives</span>
+        </a>
+        
+        <div class="lesson-item border-top" style="cursor: not-allowed; opacity: 0.6;">
+          <span class="lesson-number">4</span>
+          <span class="lesson-title">Receiving Temple Ordinances and Covenants</span>
         </div>
         
-        <div class="text-center mt-4">
-          <a href="index.html" class="btn btn-outline-primary">← Back to Home</a>
+        <div class="lesson-item border-top" style="cursor: not-allowed; opacity: 0.6;">
+          <span class="lesson-number">5</span>
+          <span class="lesson-title">Learning from the Lord through Symbols</span>
+        </div>
+        
+        <div class="lesson-item border-top" style="cursor: not-allowed; opacity: 0.6;">
+          <span class="lesson-number">6</span>
+          <span class="lesson-title">Preparing to Enter the Holy Temple</span>
+        </div>
+        
+        <div class="lesson-item border-top" style="cursor: not-allowed; opacity: 0.6;">
+          <span class="lesson-number">7</span>
+          <span class="lesson-title">Continuing to Enjoy the Blessings of Temple Attendance</span>
         </div>
       </div>
+    </div>
+    
+    <div class="text-center">
+      <a href="index.html" class="btn-back"><i class="fas fa-arrow-left" style="margin-right: 8px;"></i>Back to Home</a>
     </div>
   </div>
 

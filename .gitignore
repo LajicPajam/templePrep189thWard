@@ -1,6 +1,0 @@
-node_modules/
-.env
-*.zip
-Dockerfile
-docker-compose.yml
-.dockerignore
